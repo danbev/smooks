@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+		<groupId>org.milyn</groupId>
+        <artifactId>smooks-cartridge-base-pom</artifactId>
+        <version>1.4-SNAPSHOT</version> <!-- base pom version - do not remove this comment -->
+		<relativePath>../pom.xml</relativePath>
+    </parent>
+    <name>Milyn Smooks Cartridge - Spring</name>
+    <groupId>org.milyn</groupId>
+    <artifactId>milyn-smooks-spring</artifactId>
+
+	<dependencies>
+
+		 <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-xml</artifactId>
+            <version>2.0.0.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+
+	</dependencies>
+
+</project>

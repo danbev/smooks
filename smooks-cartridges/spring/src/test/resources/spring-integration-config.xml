@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:si-xml="http://www.springframework.org/schema/integration/xml"
+    xmlns:si="http://www.springframework.org/schema/integration" 
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	    http://www.milyn.org/xsd/smooks-transformer 
+	    http://www.milyn.org/xsd/smooks-transformer-1.0.xsd
+	    http://www.springframework.org/schema/integration
+        http://www.springframework.org/schema/integration/spring-integration-2.0.xsd
+        http://www.springframework.org/schema/integration/xml
+        http://www.springframework.org/schema/integration/xml/spring-integration-xml-2.0.xsd">
+	    
+    <bean id="smooks" class="org.milyn.Smooks">
+        <constructor-arg value="classpath:/smooks-config.xml"/>
+    </bean>
+    
+    <bean id="smooksMarshaller" class="org.milyn.smooks.spring.SmooksMarshaller">
+        <constructor-arg ref="smooks"/>
+    </bean>
+    
+    <bean id="toStringTransformer" class="org.milyn.smooks.spring.ResultToStringTransformer">
+        <property name="outputProperties">
+            <map>
+                <entry key="omit-xml-declaration" value="yes"/>
+            </map>
+        </property>
+	</bean>
+    
+    <si-xml:marshalling-transformer id="marshallingTransformer"
+	    input-channel="inputChannel" 
+	    marshaller="smooksMarshaller"
+	    result-transformer="toStringTransformer"
+	    output-channel="outputChannel"/>
+	    
+    <si:channel id="inputChannel"/>
+    
+    <si:channel id="outputChannel">
+        <si:queue capacity="10"/>
+    </si:channel>
+    
+</beans>
+

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="http://www.milyn.org/xsd/smooks-1.1.xsd"
+    xmlns:core="http://www.milyn.org/xsd/smooks/smooks-core-1.4.xsd">
+    
+	<core:exports>
+		<core:result type="org.milyn.payload.StringResult"/>
+	</core:exports>
+
+    <resource-config selector="a">
+        <resource>org.milyn.smooks.spring.support.RenamingElementVisitor</resource>
+        <param name="new-name">b</param>
+    </resource-config>
+    
+
+</smooks-resource-list>
