@@ -11,5 +11,7 @@ target
 *.ipr
 *.iws
 .idea
+bin
 runner
 .gradle
+build

@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-servlet'
+
+dependencies {
+	compile 'org.milyn:milyn-tinak:1.3'
+	compile "nekohtml:nekohtml:0.9.5"
+}

@@ -9,11 +9,10 @@ About This Example:
 	future when the peaberry activation feature is available in a maven repository.
 
     See:
-        1. The "PeaberryActivator" class in src/main/java/example/activator.PeaberryActivator.java.
-		2. pom.xml, notice that the Bundle-Activator is set to PeaberryActivator
-		3. The "Pojo" class in src/main/java/example/Pojo.java".
-        4. The input message in input-message.xml.
-        5. smooks-config.xml.
+        1. The OSGI Bundle Activator in src/main/java/example/activator.PeaberryActivator.java.
+		2. The "Pojo" class in src/main/java/example/Pojo.java".
+        3. The input message in input-message.xml.
+        4. smooks-config.xml.
 
 How to Run?
 ===========
@@ -22,8 +21,17 @@ How to Run?
         2. Maven 2.x (http://maven.apache.org/download.html)
 		3. Smooks-all bundle installed into an OSGi container, see 
 
+    Building with Maven:
+        1. "mvn clean install"
+        2. "mvn depencency:copy-dependencies"
+
+    Building with Gradle:
+        1. "gradle clean install"
+        2. "gradle copyDeps"
+
     Running:
         1. "mvn clean install"
-		3. copy guice-2.0.jar, peaberry-1.1.1.jar to your OSGi container (from target/dependencies)
-        2. copy target/milyn-smooks-example-peaberry-1.3.jar to your OSGi container
+        2. install target/dependencies/guice-2.0.jar to your OSGI container
+        3. install target/dependencies/peaberry-1.1.1.jar to your OSGI container
+        4. install target/milyn-smooks-example-peaberry-1.3.jar to your OSGi container
 

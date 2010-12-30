@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-json'
+
+dependencies {
+	compile "org.codehaus.jackson:jackson-core-lgpl:1.0.1"
+}
+

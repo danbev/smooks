@@ -1,0 +1,5 @@
+archivesBaseName = 'milyn-smooks-example-xml-to-java-virtual'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+}

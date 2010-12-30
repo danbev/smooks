@@ -1,0 +1,9 @@
+archivesBaseName = 'maven-ect-plugin'
+
+dependencies {
+	compile project (':edi/ect') 
+	compile 'org.apache.maven:maven-plugin-api:2.0'
+	compile 'org.apache.maven:maven-project:2.0'
+	compile 'org.jfrog.maven.annomojo:maven-plugin-anno:1.3.2'
+}
+

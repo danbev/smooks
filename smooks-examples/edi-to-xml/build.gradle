@@ -1,0 +1,5 @@
+archivesBaseName = 'milyn-smooks-example-edi-to-xml'
+
+dependencies {
+	compile project (':smooks-cartridges/edi')
+}

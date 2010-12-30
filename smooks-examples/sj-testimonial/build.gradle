@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-examples-sj-testimonial'
+
+dependencies {
+	compile project (':smooks-cartridges/edi')
+	compile project (':smooks-cartridges/templating')
+}

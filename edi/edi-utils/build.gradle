@@ -1,0 +1,8 @@
+archivesBaseName = 'milyn-smooks-ediutils'
+
+dependencies {
+	compile project (':smooks-cartridges/edi') 
+    compile "xerces:xercesImpl:2.9.1"
+    testCompile "org.milyn.edi.unedifact:d99a-mapping:${version}"
+    testCompile "org.milyn.edi.unedifact:d99b-mapping:${version}"
+}

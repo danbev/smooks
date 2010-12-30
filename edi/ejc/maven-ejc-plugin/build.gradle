@@ -1,0 +1,11 @@
+archivesBaseName = 'maven-ejc-plugin'
+
+dependencies {
+	//compile project (':commons')
+	//compile project (':smooks-core')
+	compile project (':edi/ejc') 
+	compile 'org.apache.maven:maven-plugin-api:2.0'
+	compile 'org.apache.maven:maven-project:2.0'
+	compile 'org.jfrog.maven.annomojo:maven-plugin-anno:1.3.2'
+}
+

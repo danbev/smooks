@@ -40,6 +40,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMSource;
 import java.io.File;
 import java.io.IOException;
@@ -552,7 +553,7 @@ public final class XMLConfigDigester {
         ExtensionContext.setExtensionContext(extentionContext, executionContext);
 
         // Filter the extension element through Smooks...
-        configDigester.filterSource(executionContext, new DOMSource(configElement), null);
+        configDigester.filterSource(executionContext, new DOMSource(configElement), (Result) null);
 
         // Copy the created resources from the ExtensionContext and onto the SmooksResourceConfigurationList...
         List<SmooksResourceConfiguration> resources = extentionContext.getResources();

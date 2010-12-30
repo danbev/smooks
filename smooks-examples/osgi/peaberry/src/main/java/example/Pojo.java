@@ -14,6 +14,8 @@
  */
 package example;
 
+import java.io.InputStream;
+
 import org.milyn.Smooks;
 
 import com.google.inject.Inject;
@@ -36,7 +38,7 @@ public class Pojo
         this.smooks = smooks;
     }
     
-    public Order filter(final String input)
+    public Order filter(final InputStream input)
     {
         Order order = ExampleUtil.performFiltering(input, smooks);
         return order;

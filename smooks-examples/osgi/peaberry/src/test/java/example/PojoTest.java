@@ -34,7 +34,7 @@ public class PojoTest {
     public void test() throws IOException, SAXException {
         Smooks smooks = new Smooks("smooks-config.xml");
         Pojo pojo = new Pojo(smooks);
-        Order order = pojo.filter("input-message.xml");
+        Order order = pojo.filter(getClass().getResourceAsStream("/input-message.xml"));
 
         assertNotNull(order);
         assertNotNull(order.getHeader());

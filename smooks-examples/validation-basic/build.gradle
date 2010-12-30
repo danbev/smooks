@@ -1,0 +1,5 @@
+archivesBaseName = 'milyn-smooks-example-validation-basic'
+
+dependencies {
+	compile project (':smooks-cartridges/validation')
+}

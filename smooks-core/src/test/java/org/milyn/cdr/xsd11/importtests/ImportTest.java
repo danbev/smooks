@@ -24,6 +24,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
+import javax.xml.transform.Result;
+
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
@@ -50,6 +52,6 @@ public class ImportTest extends TestCase {
 
     private void testConfig(String config) throws IOException, SAXException {
         Smooks smooks = new Smooks("/org/milyn/cdr/xsd11/importtests/" + config);
-        smooks.filterSource(new StringSource("<a/>"), null);
+        smooks.filterSource(new StringSource("<a/>"), (Result) null);
     }
 }

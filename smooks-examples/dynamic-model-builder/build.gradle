@@ -1,0 +1,7 @@
+archivesBaseName = 'milyn-smooks-example-dyna-model-builder'
+
+dependencies {
+	compile project (':smooks-cartridges/csv')
+	compile project (':smooks-cartridges/javabean')
+}
+

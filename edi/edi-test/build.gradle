@@ -1,0 +1,14 @@
+archivesBaseName = 'milyn-smooks-edi-test'
+
+dependencies {
+	compile project (':edi/ejc') 
+	compile project (':smooks-cartridges/routing') 
+	compile project (':testres')
+    compile xercesImpl.dependency()
+}
+
+test {
+    forkEvery=1
+    enableAssertions=false
+    jvmArgs '-Xms128m', '-Xmx512m', '-XX:MaxPermSize=256m'
+}

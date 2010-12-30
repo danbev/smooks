@@ -1,0 +1,14 @@
+archivesBaseName = 'milyn-scribe-hibernate'
+
+dependencies {
+	compile project (':smooks-core')
+	compile project (':smooks-cartridges/javabean')
+	compile project (':smooks-cartridges/templating')
+	compile project (':scribe/core')
+	compile "javax.persistence:persistence-api:1.0"
+	compile "org.hibernate:hibernate-core:3.3.2.GA"
+	compile "org.apache.ibatis:ibatis-sqlmap:2.3.0"
+    testCompile "org.testng:testng:5.7:jdk15@jar"
+}
+
+

@@ -1,0 +1,11 @@
+archivesBaseName = 'milyn-smooks-example-camel-integration'
+
+dependencies {
+	compile project (':smooks-core')
+	compile project (':smooks-cartridges/edi')
+	compile project (':smooks-cartridges/camel')
+    compile camelCore.dependency()
+    compile camelSpring.dependency()
+    testCompile camelTest.dependency()
+}
+

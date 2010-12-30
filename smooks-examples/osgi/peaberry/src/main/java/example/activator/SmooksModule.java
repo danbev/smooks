@@ -14,12 +14,17 @@
  */
 package example.activator;
 
-import static org.ops4j.peaberry.Peaberry.service;
-
+import java.io.IOException;
+import java.net.URL;
 
 import org.milyn.Smooks;
+import org.milyn.SmooksOSGIFactory;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.xml.sax.SAXException;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
 /**
  * 
@@ -28,9 +33,25 @@ import com.google.inject.AbstractModule;
  */
 public class SmooksModule extends AbstractModule
 {
+    private BundleContext bundleContext;
+    
+    public SmooksModule(final BundleContext bundleContext)
+    {
+        this.bundleContext = bundleContext;
+    }
+    
     @Override
     protected void configure()
     {
-        bind(Smooks.class).toProvider(service(Smooks.class).single());
+        //no-op
+    }
+    
+    @Provides
+    public Smooks createSmooksInstance() throws IOException, SAXException 
+    {
+        final Bundle bundle = bundleContext.getBundle();
+        final SmooksOSGIFactory smooksOSGIFactory = new SmooksOSGIFactory(bundle);
+        final URL smooksConfig = bundle.getResource("smooks-config.xml");
+        return smooksOSGIFactory.createInstance(smooksConfig.openStream());
     }
 }

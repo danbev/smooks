@@ -1,0 +1,38 @@
+archivesBaseName = 'milyn-smooks-routing'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile project (':smooks-cartridges/templating')
+	compile "javax.jms:jms:1.1"
+
+    testCompile ("com.mockrunner:mockrunner-jdk1.5-j2ee1.3:0.4") {
+		exclude (module : 'cglib-nodep')
+		exclude (module : 'jboss')
+		exclude (module : 'xerces')
+	}
+    testCompile "cglib:cglib-nodep:2.2"
+    testCompile "jboss:jboss-j2ee:4.2.0.GA"
+    testCompile hsqldb.dependency()
+    testCompile "org.apache.activemq:activemq-core:5.2.0"
+    testCompile "org.apache.derby:derby:10.4.2.0"
+    testCompile "mx4j:mx4j:3.0.2"
+    testCompile "mx4j:mx4j:mx4j-tools:3.0.1"
+    testCompile "commons-net:commons-net:20030805.205232"
+    testCompile "commons-httpclient:commons-httpclient:3.1"
+    testCompile "org.testng:testng:5.7:jdk15@jar"
+	/*
+		###################################################################################################################
+			Note that xercesImpl is included only until the SAX bug (http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6770436)
+			with Java6 has been fixed. This can then be removed. Daniel Bevenius 2008-11-12.
+		###################################################################################################################
+	*/
+    testCompile xercesImpl.dependency()
+}
+
+test { 
+	useTestNG() 
+	options.includeGroups=["unit"]
+	options.parallel='tests'
+	options.threadCount=10
+}
+

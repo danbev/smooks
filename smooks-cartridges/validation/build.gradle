@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-validation'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile project (':smooks-cartridges/rules')
+}

@@ -1,8 +1,8 @@
 package example;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.transform.stream.StreamSource;
 
@@ -20,11 +20,11 @@ public class ExampleUtil
     {
     }
 
-    public static Order performFiltering(String input, Smooks smooks)
+    public static Order performFiltering(InputStream input, Smooks smooks)
     {
         ExecutionContext executionContext = smooks.createExecutionContext();
         JavaResult result = new JavaResult();
-        StreamSource source = new StreamSource(new ByteArrayInputStream(readFileContents(input)));
+        StreamSource source = new StreamSource(input);
         smooks.filterSource(executionContext, source, result);
             
         Order order = (Order) result.getBean("order");
@@ -49,13 +49,4 @@ public class ExampleUtil
         System.out.println("\n\n");
     }
     
-    public static byte[] readFileContents(final String file) {
-        try {
-            return StreamUtils.readStream(new FileInputStream(file));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "<no-message/>".getBytes();
-        }
-    }
-        
 }

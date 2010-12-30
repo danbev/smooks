@@ -14,6 +14,14 @@
     <build>
         <resources>
             <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>smooks-config.xml</include>
+                    <include>input-message.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
@@ -50,8 +58,6 @@
 							*;-nouses:=true
 						</Import-Package>
                         <Private-Package>example</Private-Package>
-						<Smooks-Config>${basedir}/smooks-config.xml</Smooks-Config>
-						<Smooks-Input-File>${basedir}/input-message.xml</Smooks-Input-File>
                         <IncludeResource>src/main/java/example/groovy/Test.groovy</IncludeResource>
                     </instructions>
                 </configuration>

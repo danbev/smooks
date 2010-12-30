@@ -1,0 +1,5 @@
+archivesBaseName = 'milyn-smooks-example-groovy'
+
+dependencies {
+	compile project (':smooks-cartridges/scripting')
+}

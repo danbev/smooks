@@ -1,0 +1,52 @@
+import org.apache.tools.ant.filters.*
+
+archivesBaseName = 'milyn-smooks-example-blueprint'
+
+milynPackage = "org.milyn.*;version=$version" 
+springPackage = "org.springframework.*;version=1.2.0"
+
+geminiVersion = '1.0.0.M1'
+springVersion = '3.0.5.RELEASE'
+
+apply plugin: 'osgi'
+
+List springDeps = [ "org.springframework:org.springframework.core:$springVersion",
+    "org.springframework:org.springframework.aop:$springVersion",
+    "org.springframework:org.springframework.asm:$springVersion",
+    "org.springframework:org.springframework.expression:$springVersion",
+    "org.springframework:org.springframework.beans:$springVersion",
+    "org.springframework:org.springframework.context:springVersion"]
+
+dependencies {
+	compile project (':smooks-all')
+	compile project (':smooks-cartridges/javabean')
+    compile 'org.osgi:osgi_R4_core:1.0'
+    compile "org.eclipse.gemini.blueprint:gemini-blueprint-core:$geminiVersion"
+    compile "org.eclipse.gemini.blueprint:gemini-blueprint-io:$geminiVersion"
+    compile "org.eclipse.gemini.blueprint:gemini-blueprint-extender:$geminiVersion"
+    compile "org.apache.servicemix.bundles:org.apache.servicemix.bundles.aopalliance-1.0:1.0.0-rc1"
+    compile springDeps
+}
+
+repositories {
+        mavenRepo urls: ["http://zodiac.springsource.com/maven/bundles/milestone"]
+}
+
+processResources {
+    from('src/main/resources') {
+        include('OSGI-INF/blueprint/pojo.xml')
+    }
+    filter(ReplaceTokens,
+       tokens: [
+            'basedir': projectDir.toString()
+        ])
+}
+
+jar {
+	manifest {
+		name = "$archivesBaseName"
+		instruction 'Import-Package', milynPackage.toString(), springPackage.toString(), '*;-nouses:=true'
+		instruction 'Private-Package', 'example'
+	}
+}
+

@@ -9,7 +9,7 @@
 	
 	<camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
 		<route>
-			<from uri="file://${input.dir}?fileName=input-message.edi"/>
+			<from uri="file://@inputDir@?fileName=input-message.edi"/>
 			<log message="Before unmarshal  ${body}"/>
 			<unmarshal ref="smooks"/>
 			<log message="After unmarshal  ${body}"/>

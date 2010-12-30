@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-misc'
+
+dependencies {
+	compile project (':testres')
+	compile project (':commons')
+}

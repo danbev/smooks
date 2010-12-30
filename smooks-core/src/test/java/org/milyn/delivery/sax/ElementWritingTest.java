@@ -24,6 +24,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
+import javax.xml.transform.Result;
+
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
@@ -33,7 +35,7 @@ public class ElementWritingTest extends TestCase {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("OnWriterPerElementTest.xml"));
 
         try {
-            smooks.filterSource(smooks.createExecutionContext(), new StringSource("<a/>"), null);
+            smooks.filterSource(smooks.createExecutionContext(), new StringSource("<a/>"), (Result) null);
             fail("Expected SAXWriterAccessException");
         } catch(SmooksException e) {
             assertEquals("Illegal access to the element writer for element 'a' by SAX visitor 'org.milyn.delivery.sax.SAXVisitorWriter02'.  Writer already acquired by SAX visitor 'org.milyn.delivery.sax.SAXVisitorWriter01'.  See SAXElement javadocs (http://milyn.codehaus.org/Smooks).  Change Smooks visitor resource configuration.", e.getCause().getMessage());

@@ -111,7 +111,8 @@ public class AntRunner {
             project.addBuildListener(antLogger);
             project.setBaseDir(new File("./"));
 
-            File executeScript = new File("./target/ant-exec.xml");
+            File workingDir = isMavenBuild() ? new File("./target"): new File("./build");
+            File executeScript = new File(workingDir, "ant-exec.xml");
             FileOutputStream fileOs = new FileOutputStream(executeScript);
 
             try {
@@ -146,4 +147,10 @@ public class AntRunner {
             antScript.close();
         }
     }
+
+    private boolean isMavenBuild()
+    {
+        return new File("./target").exists();
+    }
+
 }

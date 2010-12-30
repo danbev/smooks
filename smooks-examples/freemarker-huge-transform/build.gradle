@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-example-ftl-huge'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile project (':smooks-cartridges/templating')
+}

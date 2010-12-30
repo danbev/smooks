@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-example-csv-to-xml-2'
+
+dependencies {
+	compile project (':smooks-cartridges/csv')
+	compile project (':smooks-cartridges/templating')
+}

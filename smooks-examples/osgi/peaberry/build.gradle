@@ -1,0 +1,43 @@
+import org.apache.tools.ant.filters.*
+
+archivesBaseName = 'milyn-smooks-example-peaberry'
+
+smooks = "org.milyn.*;version=$version" 
+model = "example.model;version=$version"
+activator = "example.activator;version=$version"
+
+apply plugin: 'osgi'
+
+dependencies {
+	compile project (':smooks-all')
+    compile 'org.osgi:osgi_R4_core:1.0'
+    compile 'com.google.inject:guice:2.0'
+    compile 'org.ops4j:peaberry:1.1.1'
+}
+
+repositories {
+        mavenRepo urls: ["http://zodiac.springsource.com/maven/bundles/milestone"]
+}
+
+sourceSets {
+    main {
+        resources.srcDir('.')
+        resources.include('smooks-config.xml')
+        resources.include('input-message.xml')
+    }
+}
+
+jar {
+	manifest {
+		name = "$archivesBaseName"
+		instruction 'Bundle-Activator', 'example.activator.PeaberryActivator'
+		instruction 'Import-Package', smooks.toString(), 'javax.xml.transform.stream', '*;-nouses:=true'
+		instruction 'Private-Package', 'example'
+	}
+}
+
+task copyDeps(type: Copy) {
+    into "$buildDir/dependencies"
+    from configurations.runtime
+}
+

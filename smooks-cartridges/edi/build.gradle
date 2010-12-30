@@ -1,0 +1,7 @@
+archivesBaseName = 'milyn-smooks-edi'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile project (':edi/edisax')
+}
+

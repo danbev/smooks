@@ -1,0 +1,6 @@
+archivesBaseName = 'smooks-examples-csv'
+
+dependencies {
+	compile project (':smooks-cartridges/csv')
+}
+

@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-scripting'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile groovy.dependency()
+}

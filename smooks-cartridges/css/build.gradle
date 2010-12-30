@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-css'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile "org.milyn:milyn-magger:1.3"
+}

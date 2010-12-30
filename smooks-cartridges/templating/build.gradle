@@ -1,0 +1,12 @@
+archivesBaseName = 'milyn-smooks-templating'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile project (':smooks-cartridges/misc')
+	compile 'antlr:stringtemplate:2.2'
+	compile 'antlr:antlr:2.7.7'
+	compile ('ognl:ognl:2.7.3') {
+		exclude(module: 'javassist')
+	}
+	compile xalan.dependency()
+}

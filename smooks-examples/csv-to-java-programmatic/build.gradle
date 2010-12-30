@@ -1,0 +1,5 @@
+archivesBaseName = 'milyn-smooks-example-csv-to-java-progmatic'
+
+dependencies {
+	compile project (':smooks-cartridges/csv')
+}

@@ -1,0 +1,40 @@
+import org.apache.tools.ant.filters.*
+
+archivesBaseName = 'milyn-smooks-example-camel-csv-to-xml'
+
+apply plugin: 'osgi'
+
+dependencies {
+	compile project (':smooks-core')
+	compile project (':smooks-cartridges/camel')
+    compile camelCore.dependency()
+    compile camelSpring.dependency()
+    compile 'org.apache.felix:org.osgi.core:1.4.0'
+    testCompile camelTest.dependency()
+}
+
+jar {
+	manifest {
+		name = "smooks-example-camel-csv-to-xml"
+		instruction 'Import-Package', '$camel.groupId.*;version=2.2', 
+			'org.milyn.*;version=$version', 
+			'org.springframework.*;version=1.2.0',
+			'*;-nouses:=true'
+		instruction 'Private-Package', 'example'
+	}
+}
+
+afterEvaluate {
+    configure(allProcessResourcesTasks()) {
+        filter(ReplaceTokens, 
+               tokens: [inputDir: 'input'])
+    }
+}
+
+def allProcessResourcesTasks() {
+    sourceSets.all.processResourcesTaskName.collect {
+        tasks[it]
+    }
+}
+
+

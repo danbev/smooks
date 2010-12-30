@@ -558,10 +558,19 @@ public class Archive {
     private void createTempDir() {
         if (tmpDir == null) {
             try {
-                File tmpFile = File.createTempFile("tmp", "tmp");
+                String jioTmpDir = System.getProperty("java.io.tmpdir");
+                File tmpFile = null;
+
+                if (jioTmpDir != null) {
+                    tmpFile = File.createTempFile("tmp", "tmp", new File(jioTmpDir));
+                } else {
+                    tmpFile = File.createTempFile("tmp", "tmp", new File("./"));
+                }
 
                 tmpFile.delete();
                 tmpDir = new File(tmpFile.getParentFile(), UUID.randomUUID().toString());
+
+
                 DeleteOnExitHook.add(tmpDir);
 
             } catch (IOException e) {

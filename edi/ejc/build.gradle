@@ -1,0 +1,14 @@
+archivesBaseName = 'milyn-smooks-ejc'
+
+dependencies {
+	compile project (':edi/ect')
+	compile project (':edi/edisax')
+	compile project (':smooks-cartridges/javabean') 
+	compile project (':smooks-cartridges/edi') 
+	compile apacheAnt.dependency()
+    compile junit.dependency()
+}
+
+manifest.mainAttributes(
+	'Main-Class': 'org.milyn.ejc.EJC'
+)

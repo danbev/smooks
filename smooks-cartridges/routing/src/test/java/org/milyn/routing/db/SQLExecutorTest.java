@@ -19,21 +19,21 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.Result;
+
+import junit.framework.TestCase;
+
+import org.hsqldb.jdbcDriver;
 import org.milyn.Smooks;
 import org.milyn.SmooksException;
-import org.milyn.db.DirectDataSource;
 import org.milyn.container.ExecutionContext;
+import org.milyn.db.DirectDataSource;
 import org.milyn.javabean.context.BeanContext;
 import org.milyn.javabean.context.BeanIdStore;
 import org.milyn.javabean.repository.BeanId;
-import org.milyn.javabean.repository.BeanIdRegister;
-import org.milyn.javabean.repository.BeanRepository;
-import org.milyn.javabean.repository.BeanRepositoryManager;
 import org.milyn.payload.StringSource;
 import org.milyn.util.HsqlServer;
 import org.xml.sax.SAXException;
-import org.hsqldb.jdbcDriver;
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
@@ -116,11 +116,11 @@ public class SQLExecutorTest extends TestCase
         ExecutionContext execContext = smooks.createExecutionContext();
         BeanContext beanContext = execContext.getBeanContext();
 
-        smooks.filterSource(execContext, new StringSource("<doc/>"), null);
+        smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
         List orders11 = (List) beanContext.getBean("orders1");
         List orders12 = (List) beanContext.getBean("orders2");
 
-        smooks.filterSource(execContext, new StringSource("<doc/>"), null);
+        smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
         List orders21 = (List) beanContext.getBean("orders1");
         List orders22 = (List) beanContext.getBean("orders2");
 
@@ -130,14 +130,14 @@ public class SQLExecutorTest extends TestCase
         // timeout the cached resultset...
         Thread.sleep(2050);
 
-        smooks.filterSource(execContext, new StringSource("<doc/>"), null);
+        smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
         List orders31 = (List) beanContext.getBean("orders1");
         List orders32 = (List) beanContext.getBean("orders2");
 
         assertTrue(orders11 != orders31);
         assertTrue(orders12 != orders32); // order12 shouldn't come from the app context cache - timed out ala TTL
 
-        smooks.filterSource(execContext, new StringSource("<doc/>"), null);
+        smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
         List orders41 = (List) beanContext.getBean("orders1");
         List orders42 = (List) beanContext.getBean("orders2");
 
@@ -153,7 +153,7 @@ public class SQLExecutorTest extends TestCase
             ExecutionContext execContext = smooks.createExecutionContext();
             BeanContext beanContext = execContext.getBeanContext();
 
-            smooks.filterSource(execContext, new StringSource("<doc/>"), null);
+            smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
             Map<String, Object> myOrder = (Map<String, Object>) beanContext.getBean("myOrder");
 
             assertEquals("{ORDERNUMBER=2, CUSTOMERNUMBER=2, PRODUCTCODE=456}", myOrder.toString());
@@ -171,7 +171,7 @@ public class SQLExecutorTest extends TestCase
             ExecutionContext execContext = smooks.createExecutionContext();
             BeanContext beanContext = execContext.getBeanContext();
 
-            smooks.filterSource(execContext, new StringSource("<doc/>"), null);
+            smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
             Map<String, Object> myOrder = (Map<String, Object>) beanContext.getBean("myOrder");
 
             assertEquals(null, myOrder);
@@ -192,7 +192,7 @@ public class SQLExecutorTest extends TestCase
 
             beanContext.addBean(requiredOrderNumId, 9999, null);
             try {
-                smooks.filterSource(execContext, new StringSource("<doc/>"), null);
+                smooks.filterSource(execContext, new StringSource("<doc/>"), (Result) null);
                 fail("Expected DataSelectionException");
             } catch(SmooksException e) {
                 assertEquals("Order with ORDERNUMBER=9999 not found in Database", e.getCause().getMessage());

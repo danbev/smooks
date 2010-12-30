@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Clemens Fuchslocher
  */
-public class Test extends TestCase {
+public class MILYN_428_Test extends TestCase {
 
 	// No errors.
 	public void test01() throws IOException, SAXException {
@@ -222,8 +222,8 @@ public class Test extends TestCase {
 		}
 
 		CSVHeaderValidationException validation = (CSVHeaderValidationException) cause;
-		assertEquals(expected, validation.getExpected());
-		assertEquals(found, validation.getFound());
+		assertEquals(expected, validation.getExpected().toArray(new String[]{}));
+		assertEquals(found, validation.getFound().toArray(new String[]{}));
 		assertEquals(message, validation.getMessage());
 	}
 

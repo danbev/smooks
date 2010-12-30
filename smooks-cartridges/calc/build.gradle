@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-calc'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	testCompile "org.testng:testng:5.7:jdk15@jar"
+}

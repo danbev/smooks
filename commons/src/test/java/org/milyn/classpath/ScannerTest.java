@@ -39,7 +39,7 @@ public class ScannerTest extends TestCase {
 		File targetDir = new File ( "target" );
         File classesDir = new File( targetDir, "classes" );
         File testClassesDir = new File( targetDir, "test-classes" );
-        classLoader = new URLClassLoader(new URL[] { classesDir.toURL(), testClassesDir.toURL() });
+        classLoader = new URLClassLoader(new URL[] { classesDir.toURI().toURL(), testClassesDir.toURI().toURL() });
 	}
 
     public void test_instanceof_has_include() throws IOException {

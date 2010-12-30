@@ -1,0 +1,32 @@
+import org.apache.tools.ant.filters.*
+
+archivesBaseName = 'milyn-smooks-example-bundle-activator'
+milynPackage = "org.milyn.*;version=$version" 
+
+apply plugin: 'osgi'
+
+dependencies {
+	compile project (':smooks-all')
+    compile 'org.osgi:osgi_R4_core:1.0'
+}
+
+repositories {
+        mavenRepo urls: ["http://zodiac.springsource.com/maven/bundles/milestone"]
+}
+
+sourceSets {
+    main {
+        resources.srcDir('.')
+        resources.include('smooks-config.xml')
+        resources.include('input-message.xml')
+    }
+}
+
+jar {
+	manifest {
+		name = "$archivesBaseName"
+		instruction 'Import-Package', milynPackage.toString(), '*;-nouses:=true'
+		instruction 'Private-Package', 'example'
+		instruction 'Bundle-Activator', 'example.activator.MainActivator'
+	}
+}

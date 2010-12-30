@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-yaml'
+
+dependencies {
+	compile 'org.yaml:snakeyaml:1.6'
+}
+

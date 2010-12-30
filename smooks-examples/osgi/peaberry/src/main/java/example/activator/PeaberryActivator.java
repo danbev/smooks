@@ -17,6 +17,8 @@ package example.activator;
 
 import static org.ops4j.peaberry.Peaberry.osgiModule;
 
+import java.net.URL;
+
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -38,11 +40,11 @@ public class PeaberryActivator implements BundleActivator
     {
         System.out.println(context.getBundle().getHeaders().get("Bundle-Name") + " start");
         
-        final Injector injector = Guice.createInjector(osgiModule(context), new SmooksModule());
+        final Injector injector = Guice.createInjector(osgiModule(context), new SmooksModule(context));
         final Pojo pojo = injector.getInstance(Pojo.class);
         
-        final String inputFile = (String) context.getBundle().getHeaders().get("Smooks-Input-File");
-        final Order order = pojo.filter(inputFile);
+        final URL inputURL = context.getBundle().getResource("input-message.xml");
+        final Order order = pojo.filter(inputURL.openStream());
         
         ExampleUtil.printOrder(order);
         

@@ -1,0 +1,106 @@
+import org.apache.tools.ant.filters.*
+
+description='Smooks-all is responsible for building a jar/bundle containing all the classes and merged resources from all the Smooks sub projects'
+
+archivesBaseName='milyn-smooks-all'
+
+spring_objectweb_version='2.2.3'
+spring_freemarker_version='2.3.15'
+spring_antlr_version='2.7.7'
+spring_jaxen_version='1.1.1'
+spring_commons_logging_version='1.1.1'
+spring_groovy_version='1.5.7'
+spring_log4j_version='1.2.15'
+commons_lang_version='2.4'
+opencsv_version='1.0.23'
+mvel_version='2.0.17'
+jaxen_version='1.1.1'
+
+configurations {
+    provided {
+        description = "provided 'scope'"
+        transitive = true
+    }
+    testCompile.extendsFrom provided
+    compile.transitive = true
+}
+
+dependencies {
+    provided project (':smooks-core')
+    compile "org.mvel:mvel2:$mvel_version"
+    compile(jaxen.dependency()) {
+        exclude group: 'dom4j', module: 'jdom4j'
+        exclude group: 'jdom', module: 'jdom'
+        exclude group: 'xml-apis', module: 'xml-apis'
+        exclude group: 'xerces', module: 'xmlParserAPIs'
+        exclude group: 'xerces', module: 'xercesImpl'
+        exclude group: 'xom', module: 'xom'
+    }
+    provided 'org.osgi:osgi_R4_core:1.0'
+    provided 'org.jboss.shrinkwrap:shrinkwrap-api:1.0.0-alpha-11'
+    provided 'org.jboss.shrinkwrap:shrinkwrap-impl-base:1.0.0-alpha-11'
+}
+
+repositories {
+    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/release"]
+    mavenRepo urls: ["http://repository.springsource.com/maven/bundles/external"]
+}
+
+sourceSets.main.compileClasspath += configurations.provided
+
+projects = project(":").subprojects.findAll{ 
+    def path = it.path
+    !path.startsWith(':smooks-examples') && 
+    !path.startsWith(':testres') && 
+    !path.startsWith(':edi/ejc') && 
+    !path.startsWith(':edi/ect') && 
+    !path.startsWith(':edi/edi-test') && 
+    !path.startsWith(':edi/edi-util') && 
+    it.project != project 
+}
+
+resourcesToMerge = ['content-handlers.inf', 'data-decoders.inf']
+
+jar {
+    doFirst {
+        merge(projects, resourcesToMerge)
+    }
+    manifest {
+        from ('src/main/resources/META-INF/MANIFEST.MF')
+    }
+    from(projects.each{}.sourceSets.main.classes) {
+        exclude resourcesToMerge.collect{"**/$it"}
+        exclude '**/overview.html'
+        exclude '**/package.html'
+        exclude '**/log4j.xml'
+        exclude '**/features.xml'
+    }
+}
+
+def merge(TreeSet projects, List resources) {
+    projects.findAll { 
+        it.sourceSets.main.resources.find { file -> 
+            if (resources.contains(file.name)) {
+                fileName = "$project.sourceSets.main.classesDir/META-INF/$file.name"
+                new File(fileName).append(file.text)
+                logger.lifecycle("appending to to $fileName")
+            }
+        }
+    }
+}
+
+processResources {
+    filter(ReplaceTokens,
+           tokens: [
+                'project.version': version,
+                'spring.objectweb.version': spring_objectweb_version,
+                'spring.freemarker.version': spring_freemarker_version,
+                'spring.antlr.version': spring_antlr_version,
+                'spring.jaxen.version': spring_jaxen_version,
+                'spring.commons.logging_version': spring_commons_logging_version,
+                'spring.groovy.version': spring_groovy_version,
+                'spring.log4j.version': spring_log4j_version,
+                'commons.lang.version': commons_lang_version,
+                'opencsv.version': opencsv_version
+            ])
+}

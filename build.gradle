@@ -1,0 +1,167 @@
+description='Smooks project'
+
+apply from: 'versions.gradle'
+
+def dirToArtifactMap = [
+	'smooks-core': 'milyn-smooks-core', 
+	'commons': 'milyn-commons', 
+	'smooks-examples/camel/camel-dataformat': 'milyn-smooks-example-camel-dataformat',
+	'smooks-examples/camel/camel-integration': 'milyn-smooks-example-camel-integration',
+	'smooks-examples/csv-to-java': 'milyn-smooks-example-csv-to-java',
+	'edi/edisax': 'milyn-edisax-parser',
+	'edi/ect': 'milyn-smooks-ect',
+	'edi/ejc': 'milyn-smooks-ejc',
+	'scribe/core': 'milyn-scribe-core',
+	'/edi/edisax': '/milyn-edisax-parser']
+
+allprojects {
+
+	group = 'org.milyn'
+	version = '1.5-SNAPSHOT'
+
+	sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_5
+	targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_5
+
+	defaultTasks 'test','install'
+	buildDir = 'target'
+
+	repositories {
+ 		mavenRepo urls: ["http://repository.codehaus.org"]
+ 		mavenRepo urls: ["http://snapshots.repository.codehaus.org"]
+ 		mavenRepo urls: ["http://www.jfrog.org/artifactory/plugins-releases"]
+ 		mavenRepo urls: ["https://repository.jboss.org/nexus/content/groups/public"]
+	}
+}
+
+configure(subprojects) {
+	apply plugin: 'java'
+	apply plugin: 'maven'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+
+	dependencies {
+		compile(commonsLogging.dependency()) {
+			exclude(module: 'logkit')
+			exclude(module: 'avalon-framework')
+			exclude(module: 'servlet-api')
+		}
+		compile commonsLang.dependency()
+		compile freemarker.dependency()
+		compile javassist.dependency()
+		testCompile log4j.dependency()
+		testCompile junit.dependency()
+		testCompile xmlUnit.dependency()
+		testCompile hamcrest.dependency()
+		testCompile mockejb.dependency()
+		testCompile mockito.dependency()
+		testCompile mockobjectsCore.dependency()
+	}
+
+	sourceSets {
+		main {
+			classesDir = new File(buildDir, 'classes')
+			resources {
+				srcDir 'src/main/java'
+			}
+		}
+		test {
+			classesDir = new File(buildDir, 'test-classes')
+			resources {
+				srcDir 'src/test/java'
+			}
+		}
+	}
+	
+	configure(install.repositories.mavenInstaller) {
+		pom.whenConfigured { pom ->
+            pom.artifactId = archivesBaseName
+        
+			pom.dependencies.findAll {
+				String artifactId = it.artifactId
+
+				if (artifactId.startsWith('smooks-cartridges/')) {
+					name = artifactId.substring(artifactId.lastIndexOf('/')+1)
+					it.artifactId = "milyn-smooks-$name"
+				}
+				else if (dirToArtifactMap.containsKey(artifactId)) {
+					def newArtifactId = dirToArtifactMap[artifactId]
+					it.artifactId = newArtifactId
+				}
+			}
+		}
+	}
+
+	eclipseClasspath {
+		whenConfigured { classpath -> 
+			classpath.entries.findAll { entry -> 
+				if (entry.class.simpleName == 'ProjectDependency' ) {
+                    Project dep = findProject( entry.path.replaceFirst('/',':') );
+                    if (dep != null)
+                        entry.path = "/$dep.archivesBaseName"
+                }
+            } 
+        }
+    }
+
+    eclipseProject {
+        whenConfigured { project -> 
+            project.name = archivesBaseName
+        }
+    }
+}
+
+cartridges = subprojects.findAll { project ->
+    project.path.startsWith(':smooks-cartridges/')
+}
+
+examples = subprojects.findAll { project ->
+    project.path.startsWith(':smooks-examples/')
+}
+
+scribe = subprojects.findAll { project ->
+    project.path.startsWith(':scribe/')
+}
+
+configure(cartridges + examples + scribe) {
+
+	dependencies {
+		compile project (':smooks-core')
+	}
+
+	configure(install.repositories.mavenInstaller) {
+		pom.project {
+			groupId 'org.milyn'
+			artifactId archivesBaseName
+		}
+	}
+}
+
+configure(examples) {
+
+	task(main, type : JavaExec) {
+		description = 'Run the example.Main'
+		main = 'example.Main'
+		classpath = sourceSets.main.runtimeClasspath
+	}
+
+    sourceSets {
+        main {
+            resources {
+                srcDir 'projectDir'
+            }
+        }
+        test {
+            resources {
+                srcDir 'src/test/java'
+            }
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    group = 'Buildmaster'
+    description = "Generates gradlew and gradlew.bat bootstrap scripts"
+    gradleVersion = '0.9.2'
+    jarFile = 'wrapper/gradle-wrapper.jar'
+}
+

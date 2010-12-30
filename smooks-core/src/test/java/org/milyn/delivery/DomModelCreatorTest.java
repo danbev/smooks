@@ -23,6 +23,7 @@ import org.milyn.io.StreamUtils;
 import org.milyn.xml.XmlUtil;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 
@@ -41,7 +42,7 @@ public class DomModelCreatorTest extends TestCase {
         smooks.setFilterSettings(FilterSettings.DEFAULT_SAX);
 
         ExecutionContext executionContext = smooks.createExecutionContext();
-        smooks.filterSource(executionContext, new StreamSource(getClass().getResourceAsStream("order-message.xml")), null);
+        smooks.filterSource(executionContext, new StreamSource(getClass().getResourceAsStream("order-message.xml")), (Result) null);
 
         DOMModel nodeModel = DOMModel.getModel(executionContext);
 
@@ -91,7 +92,7 @@ public class DomModelCreatorTest extends TestCase {
         smooks.setFilterSettings(FilterSettings.DEFAULT_SAX);
 
         ExecutionContext executionContext = smooks.createExecutionContext();
-        smooks.filterSource(executionContext, new StreamSource(getClass().getResourceAsStream("order-message.xml")), null);
+        smooks.filterSource(executionContext, new StreamSource(getClass().getResourceAsStream("order-message.xml")), (Result) null);
 
         DOMModel nodeModel = DOMModel.getModel(executionContext);
 
@@ -151,7 +152,7 @@ public class DomModelCreatorTest extends TestCase {
         smooks.setFilterSettings(FilterSettings.DEFAULT_SAX);
 
         ExecutionContext executionContext = smooks.createExecutionContext();
-        smooks.filterSource(executionContext, new StreamSource(getClass().getResourceAsStream("order-message-with-ns.xml")), null);
+        smooks.filterSource(executionContext, new StreamSource(getClass().getResourceAsStream("order-message-with-ns.xml")), (Result) null);
 
         DOMModel nodeModel = DOMModel.getModel(executionContext);
 

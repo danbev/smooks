@@ -1,0 +1,8 @@
+archivesBaseName = 'milyn-smooks-example-db-extract-transform-load'
+
+dependencies {
+	compile project (':smooks-cartridges/edi')
+	compile project (':smooks-cartridges/routing')
+	compile 'hsqldb:hsqldb:1.8.0.7'
+}
+

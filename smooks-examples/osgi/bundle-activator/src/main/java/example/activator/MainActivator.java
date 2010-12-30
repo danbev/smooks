@@ -15,9 +15,13 @@
 
 package example.activator;
 
+import java.io.IOException;
+import java.net.URL;
+
 import org.milyn.Smooks;
 import org.milyn.SmooksFactory;
 import org.milyn.SmooksOSGIFactory;
+import org.milyn.io.StreamUtils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -32,13 +36,13 @@ public class MainActivator implements BundleActivator
 {
     private Smooks smooks;
     
-    public void start(BundleContext context) throws Exception
+    public void start(final BundleContext context) throws Exception
     {
         try
         {
 	        final SmooksFactory smooksOSGIFactory = new SmooksOSGIFactory(context.getBundle());
-	        final String config = (String) context.getBundle().getHeaders().get("Smooks-Config");
-	        smooks = smooksOSGIFactory.createInstance(config);
+	        final URL configURL = context.getBundle().getResource("smooks-config.xml");
+	        smooks = smooksOSGIFactory.createInstance(configURL.openStream());
 	        performFiltering(context);
         } 
         catch (Exception e)
@@ -47,13 +51,13 @@ public class MainActivator implements BundleActivator
         }
     }
 
-    private void performFiltering(BundleContext context)
+    private void performFiltering(final BundleContext context) throws IOException
     {
-        String input = (String) context.getBundle().getHeaders().get("Smooks-Input-File");
-        ExampleUtil.performFiltering(input, smooks);
+        final URL inputURL = context.getBundle().getResource("input-message.xml");
+        ExampleUtil.performFiltering(inputURL.openStream(), smooks);
     }
 	
-    public void stop(BundleContext context) throws Exception
+    public void stop(final BundleContext context) throws Exception
     {
         System.out.println("MainActivator stop");
         if (smooks != null)

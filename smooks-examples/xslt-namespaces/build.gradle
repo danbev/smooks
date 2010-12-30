@@ -1,0 +1,5 @@
+archivesBaseName = 'milyn-smooks-example-xslt-namespaces'
+
+dependencies {
+	compile project (':smooks-cartridges/templating')
+}

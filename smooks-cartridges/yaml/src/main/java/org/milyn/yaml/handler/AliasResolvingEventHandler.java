@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.xerces.impl.xs.identity.ValueStore;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.yaml.snakeyaml.events.AliasEvent;

@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-rules'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+    compile 'net.sf.opencsv:opencsv:1.8'
+}

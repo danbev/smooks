@@ -1,0 +1,32 @@
+freemarker = [groupId: 'org.freemarker', artifactId: 'freemarker', version: '2.3.15']
+groovy = [groupId: 'org.codehaus.groovy', artifactId: 'groovy-all', version: '1.5.7']
+javassist = [groupId: 'javassist', artifactId: 'javassist', version: '3.10.0.GA']
+apacheAnt = [groupId: 'org.apache.ant', artifactId: 'ant', version: '1.7.0']
+log4j = [groupId: 'log4j', artifactId: 'log4j', version: '1.2.14']
+commonsLang = [groupId: 'commons-lang', artifactId: 'commons-lang', version: '2.4']
+commonsLogging = [groupId: 'commons-logging', artifactId: 'commons-logging', version: '1.1']
+junit = [groupId: 'junit', artifactId: 'junit', version: '4.8.1']
+xmlUnit = [groupId: 'xmlunit', artifactId: 'xmlunit', version: '1.1']
+hamcrest = [groupId: 'org.hamcrest', artifactId: 'hamcrest-all', version: '1.1']
+mockejb = [groupId: 'org.mockejb', artifactId: 'mockejb', version: '0.6-beta2']
+mockito = [groupId: 'org.mockito', artifactId: 'mockito-all', version: '1.8.0']
+mockobjectsCore = [groupId: 'mockobjects', artifactId: 'mockobjects-core', version: '0.09']
+servletApi = [groupId: 'javax.servlet', artifactId: 'servlet-api', version: '2.5']
+hsqldb = [groupId: 'hsqldb', artifactId: 'hsqldb', version: '1.8.0.7']
+transactionApi = [groupId: 'javax.transaction', artifactId: 'jta', version: '1.1']
+camelCore = [groupId: 'org.apache.camel', artifactId: 'camel-core', version: '2.8.0']
+camelSpring = [groupId: camelCore.groupId, artifactId: 'camel-spring', version: camelCore.version]
+camelTest = [groupId: camelCore.groupId, artifactId: 'camel-test', version: camelCore.version]
+xstream = [groupId: 'com.thoughtworks.xstream', artifactId: 'xstream', version: '1.2.2']
+mvel2 = [groupId: 'org.mvel', artifactId: 'mvel2', version: '2.0.17']
+jaxen = [groupId: 'jaxen', artifactId: 'jaxen', version: '1.1.1']
+dtdParser = [groupId: 'dtdparser', artifactId: 'dtdparser', version: '1.21']
+xercesImpl = [groupId: 'xerces', artifactId: 'xercesImpl', version: '2.9.1']
+xalan = [groupId: 'xalan', artifactId: 'xalan', version: '2.7.1']
+
+/*
+Adding a method to the LinkedHashMap class which is the type of the above dependencies. 
+For example, calling freemarker.dependency() will return:
+"org.freemarker:freemarker:2.3.15"
+*/
+LinkedHashMap.metaClass.dependency = { -> "$groupId:$artifactId:$delegate.version" }

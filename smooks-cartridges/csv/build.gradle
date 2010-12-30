@@ -1,0 +1,7 @@
+archivesBaseName = 'milyn-smooks-csv'
+
+dependencies {
+	compile project (':smooks-cartridges/javabean')
+	compile project (':smooks-cartridges/flatfile')
+	compile 'net.sf.opencsv:opencsv:1.8'
+}

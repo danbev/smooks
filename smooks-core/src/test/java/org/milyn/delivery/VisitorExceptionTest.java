@@ -20,6 +20,7 @@ import org.milyn.Smooks;
 import org.milyn.SmooksException;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.StringReader;
@@ -63,13 +64,13 @@ public class VisitorExceptionTest extends TestCase {
 
         if(expectException) {
             try {
-                smooks.filterSource(smooks.createExecutionContext(), new StreamSource(new StringReader("<doc/>")), null);
+                smooks.filterSource(smooks.createExecutionContext(), new StreamSource(new StringReader("<doc/>")), (Result) null);
                 fail("Expected SmooksException");
             } catch(SmooksException e) {
                 assertEquals("Terminate Exception", e.getCause().getMessage());
             }
         } else {
-            smooks.filterSource(smooks.createExecutionContext(), new StreamSource(new StringReader("<doc/>")), null);
+            smooks.filterSource(smooks.createExecutionContext(), new StreamSource(new StringReader("<doc/>")), (Result) null);
         }
     }
 }

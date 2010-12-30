@@ -7,17 +7,21 @@
             <ref component-id="smooks"/>
         </argument>
         <argument>
-            <value type="java.lang.String">${basedir}/input-message.xml</value>
+            <value type="java.lang.String">@basedir@/input-message.xml</value>
         </argument>
     </bean>
     
-    <bean id="smooks" class="org.milyn.Smooks" factory-ref="smooksOsgiFactory" factory-method="create">
+    <bean id="smooks" class="org.milyn.Smooks" factory-ref="smooksOsgiFactory" factory-method="createInstance">
+	    <argument>
+            <value type="java.lang.String">@basedir@/smooks-config.xml</value>
+        </argument>
+    </bean>
+    
+    <bean id="smooksOsgiFactory" class="org.milyn.SmooksOSGIFactory">
 	    <argument>
 	       <ref component-id="blueprintBundle"/>
         </argument>
     </bean>
-    
-    <bean id="smooksOsgiFactory" class="org.milyn.SmooksOSGIFactoryImpl"/>
     
 </blueprint>
 

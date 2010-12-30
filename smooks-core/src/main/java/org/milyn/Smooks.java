@@ -441,7 +441,7 @@ public class Smooks {
      * @throws SmooksException Failed to filter.
      */
     public void filterSource(Source source) throws SmooksException {
-        filterSource(createExecutionContext(), source, null);
+        filterSource(createExecutionContext(), source, (Result) null);
     }
 
     /**

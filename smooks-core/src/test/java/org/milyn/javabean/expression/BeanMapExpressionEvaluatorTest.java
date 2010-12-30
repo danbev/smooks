@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamSource;
 
 import junit.framework.TestCase;
@@ -46,7 +47,7 @@ public class BeanMapExpressionEvaluatorTest extends TestCase {
         execContext.getBeanContext().addBean("aBean", bean, null);
         bean.put("a", "hello");
         
-        smooks.filterSource(execContext, new StreamSource(new StringReader("<a/>")), null);
+        smooks.filterSource(execContext, new StreamSource(new StringReader("<a/>")), (Result) null);
         assertTrue(DOMVisitor.visited);
 
         DOMVisitor.visited = false;
@@ -56,7 +57,7 @@ public class BeanMapExpressionEvaluatorTest extends TestCase {
         execContext.getBeanContext().addBean("aBean", bean, null);
         bean.put("a", "goodbye");        
         
-        smooks.filterSource(execContext, new StreamSource(new StringReader("<a/>")), null);
+        smooks.filterSource(execContext, new StreamSource(new StringReader("<a/>")), (Result) null);
         assertFalse(DOMVisitor.visited);
     }
 

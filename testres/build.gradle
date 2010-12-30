@@ -1,0 +1,10 @@
+archivesBaseName = "testres"
+
+dependencies {
+	compile servletApi.dependency()
+	compile apacheAnt.dependency()
+	compile 'mockobjects:mockobjects-core:0.09'
+	compile 'mockobjects:mockobjects-j1.4-j2ee1.3:0.07'
+	compile xmlUnit.dependency()
+}
+

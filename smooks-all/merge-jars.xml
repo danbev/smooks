@@ -26,8 +26,8 @@
 			<fileset dir="${basedir}/target" includes="dependency/milyn*.jar"/>
 		</merge>
 
-        <jar destfile="./target/milyn-smooks-all-${smooks.version}-sources.jar">
-            <zipgroupfileset dir="./target/sources" includes="milyn*.jar"/>
+        <jar destfile="${basedir}/target/milyn-smooks-all-${smooks.version}-sources.jar">
+            <zipgroupfileset dir="${basedir}/target/sources" includes="milyn*.jar"/>
         </jar>
 
     </target>

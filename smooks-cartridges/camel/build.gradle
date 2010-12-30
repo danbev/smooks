@@ -1,0 +1,13 @@
+archivesBaseName = 'milyn-smooks-camel'
+
+dependencies {
+	compile project (':smooks-core')
+	compile project (':smooks-cartridges/javabean')
+	compile project (':smooks-cartridges/edi')
+	compile project (':smooks-cartridges/csv')
+	compile project (':smooks-cartridges/templating')
+    compile camelCore.dependency()
+    compile camelSpring.dependency()
+    testCompile camelTest.dependency()
+}
+

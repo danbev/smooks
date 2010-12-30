@@ -22,6 +22,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 
+import javax.xml.transform.Result;
+
 /**
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  */
@@ -44,7 +46,7 @@ public class ExecutionLifecycleTest extends TestCase {
     public void test_dom_01() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("dom-config-01.xml"));
 
-        smooks.filterSource(new StringSource("<a><b/><c/><d/><e/></a>"), null);
+        smooks.filterSource(new StringSource("<a><b/><c/><d/><e/></a>"), (Result) null);
         assertTrue(DomAssemblyBefore.cleaned);
         assertTrue(DomAssemblyAfter.cleaned);
         assertTrue(DomAssemblyAfterWithException.cleaned);
@@ -56,14 +58,14 @@ public class ExecutionLifecycleTest extends TestCase {
     public void test_dom_02() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("dom-config-02.xml"));
 
-        smooks.filterSource(new StringSource("<a></a>"), null);
+        smooks.filterSource(new StringSource("<a></a>"), (Result) null);
         assertTrue(DomProcessingVisitCleanable.cleaned);
     }
 
     public void test_SAX_01() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("sax-config-01.xml"));
 
-        smooks.filterSource(new StringSource("<a><b/><c/><d/><e/></a>"), null);
+        smooks.filterSource(new StringSource("<a><b/><c/><d/><e/></a>"), (Result) null);
         assertTrue(SaxVisitBefore.initialized);
         assertTrue(SaxVisitBefore.cleaned);
         assertTrue(SaxVisitAfter.cleaned);
@@ -72,7 +74,7 @@ public class ExecutionLifecycleTest extends TestCase {
     public void test_SAX_02() throws IOException, SAXException {
         Smooks smooks = new Smooks(getClass().getResourceAsStream("sax-config-02.xml"));
 
-        smooks.filterSource(new StringSource("<a></a>"), null);
+        smooks.filterSource(new StringSource("<a></a>"), (Result)  null);
         assertTrue(SaxVisitCleanable.cleaned);
     }
 }

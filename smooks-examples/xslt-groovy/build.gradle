@@ -1,0 +1,6 @@
+archivesBaseName = 'milyn-smooks-example-xslt-groovy'
+
+dependencies {
+	compile project (':smooks-cartridges/templating')
+	compile project (':smooks-cartridges/scripting')
+}
