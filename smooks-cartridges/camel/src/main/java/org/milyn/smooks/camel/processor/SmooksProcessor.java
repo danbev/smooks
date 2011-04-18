@@ -214,21 +214,27 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware
         log.info(this + " Started");
     }
 
-    private Smooks createSmooks(String configUri) throws IOException, SAXException
+    private Smooks createSmooks(final String configUri) throws IOException, SAXException
     {
         if (smooks != null)
         {
             return smooks;
         }
         
-        final Smooks service = (Smooks) camelContext.getRegistry().lookup(Smooks.class.getName());
-        if (service != null)
+        final Smooks s = new Smooks();
+        setOsgiClassLoader(s);
+        s.addConfigurations(configUri);
+        return s;
+    }
+    
+    private Smooks setOsgiClassLoader(final Smooks smooks)
+    {
+        final ClassLoader cl = (ClassLoader) camelContext.getRegistry().lookup("org.milyn.BundleClassLoaderDelegator");
+        if (cl != null)
         {
-            log.info("Found smooks in registry: " + service.getClass().getName());
-            return service;
+            smooks.setClassLoader(cl);
         }
-
-        return new Smooks(configUri);
+        return smooks;
     }
 
     private void addAppenders(Smooks smooks, Set<VisitorAppender> appenders)

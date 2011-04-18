@@ -26,8 +26,8 @@ import org.xml.sax.SAXException;
  */
 public interface SmooksOSGIFactory
 {
-    Smooks create(Bundle bundle) throws IOException, SAXException;
+    ClassLoader create(Bundle bundle) throws IOException, SAXException;
     
-    Smooks create(Bundle bundle, String config) throws IOException, SAXException;
+    ClassLoader create(Bundle bundle, String config) throws IOException, SAXException;
 
 }

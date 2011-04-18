@@ -26,24 +26,14 @@ import org.xml.sax.SAXException;
  */
 public class SmooksOSGIFactoryImpl implements SmooksOSGIFactory
 {
-    public Smooks create(final Bundle bundle) throws IOException, SAXException
+    public ClassLoader create(final Bundle bundle) throws IOException, SAXException
     {
-        return create(bundle, (String) bundle.getHeaders().get("Smooks-Config"));
+        return create(bundle, null);
     }
     
-    public Smooks create(final Bundle bundle, final String config) throws IOException, SAXException
+    public ClassLoader create(final Bundle bundle, final String config) throws IOException, SAXException
     {
-        final Smooks smooks = new Smooks();
-        smooks.setClassLoader(new BundleClassLoaderDelegator(bundle, getClass().getClassLoader()));
-        if (config != null)
-        {
-	        smooks.addConfigurations(config);
-        }
-        else
-        {
-            smooks.addConfigurations("smooks-config.xml");
-        }
-        return smooks;
+        return new BundleClassLoaderDelegator(bundle, getClass().getClassLoader());
     }
     
 }

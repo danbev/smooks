@@ -6,9 +6,17 @@
 	<camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
 		<route>
 			<from uri="file://${input.dir}?fileName=input-message.csv"/>
-			<log message="Before SmooksComponent  ${body}"/>
+			<log message="Before SmooksComp  ${body}"/>
 			<to uri="smooks://smooks-config.xml"/>
-			<log message="After SmooksComponent  ${body}"/>
+			<log message="After SmooksComp  ${body}"/>
+
+			<setBody>
+			    <simple>Tom,Fennelly,Male,4,Ireland</simple>
+			</setBody>
+
+			<log message="Before SmooksComponent2  ${body}"/>
+			<to uri="smooks://smooks-config2.xml"/>
+			<log message="After SmooksComponent2  ${body}"/>
 		</route>
 	</camelContext>
 

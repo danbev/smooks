@@ -14,8 +14,6 @@
  */
 package org.milyn;
 
-import java.util.Properties;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -27,8 +25,7 @@ public class SmooksActivator implements BundleActivator
     public void start(BundleContext context) throws Exception
     {
         SmooksServiceFactory smooksOSGIFactory = new SmooksServiceFactory();
-        registerService = context.registerService(Smooks.class.getName(), smooksOSGIFactory, new Properties());
-        
+        registerService = context.registerService(BundleClassLoaderDelegator.class.getName(), smooksOSGIFactory, null);
     }
 
     public void stop(BundleContext context) throws Exception

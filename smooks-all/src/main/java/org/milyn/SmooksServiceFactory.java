@@ -29,26 +29,18 @@ public class SmooksServiceFactory implements ServiceFactory
 {
     public Object getService(Bundle bundle, ServiceRegistration registration)
     {
-        Smooks smooks = null;
         try
         {
-	        SmooksOSGIFactory factory = new SmooksOSGIFactoryImpl();
-	        smooks = factory.create(bundle);
+	        return new BundleClassLoaderDelegator(bundle, getClass().getClassLoader());
         } 
         catch (Exception e)
         {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } 
-        return smooks;
     }
 
     public void ungetService(Bundle bundle, ServiceRegistration registration, Object service)
     {
-        Smooks smooks = (Smooks) service;
-        if (smooks != null)
-        {
-            smooks.close();
-        }
     }
 
 }
