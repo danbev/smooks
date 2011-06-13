@@ -5,11 +5,10 @@
 		<groupId>org.milyn</groupId>
 		<artifactId>smooks-examples</artifactId>
 		<version>1.5-SNAPSHOT</version> <!-- base pom version - do not remove this comment -->
+        <relativePath>../pom.xml</relativePath>
 	</parent>
     <name>Milyn Smooks Example - Smooks Camel Root</name>
-	<groupId>org.milyn</groupId>
 	<artifactId>milyn-smooks-example-camel</artifactId>
-	<version>1.0</version>
 	<packaging>pom</packaging>
 
 	<modules>
