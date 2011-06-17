@@ -16,7 +16,15 @@
 package org.milyn.ejc;
 
 import org.apache.commons.logging.Log;
-import org.milyn.edisax.model.internal.*;
+import org.milyn.edisax.model.internal.Component;
+import org.milyn.edisax.model.internal.DelimiterType;
+import org.milyn.edisax.model.internal.Edimap;
+import org.milyn.edisax.model.internal.Field;
+import org.milyn.edisax.model.internal.MappingNode;
+import org.milyn.edisax.model.internal.Segment;
+import org.milyn.edisax.model.internal.SegmentGroup;
+import org.milyn.edisax.model.internal.SubComponent;
+import org.milyn.edisax.model.internal.ValueNode;
 import org.milyn.javabean.pojogen.JClass;
 import org.milyn.javabean.pojogen.JMethod;
 import org.milyn.javabean.pojogen.JNamedType;
@@ -318,7 +326,6 @@ public class ClassModelCompiler {
         if(child == null) {
             String packageName = parentBinding.getBeanClass().getPackageName();
             String className = EJCUtils.encodeClassName(mappingNode.getJavaName());
-            String postfix = mappingNode.getNodeTypeRef();
 
             if(mappingNode instanceof Field) {
                 packageName += ".field";
@@ -326,14 +333,6 @@ public class ClassModelCompiler {
                 packageName += ".component";
             } else if(mappingNode instanceof SubComponent) {
                 packageName += ".subcomponent";
-            }
-
-            if(postfix != null) {
-                int colonIdx = postfix.indexOf(":");
-                if(colonIdx != -1) {
-                    postfix = postfix.substring(colonIdx + 1);
-                }
-                className += postfix;
             }
 
             child = new JClass(packageName, className, getCurrentClassId()).setSerializable();
