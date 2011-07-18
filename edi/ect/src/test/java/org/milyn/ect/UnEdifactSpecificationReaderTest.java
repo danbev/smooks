@@ -42,7 +42,6 @@ import org.milyn.ect.formats.unedifact.UnEdifactSpecificationReader;
 import org.milyn.edisax.EDIConfigurationException;
 import org.milyn.edisax.EDIParser;
 import org.milyn.edisax.model.internal.Edimap;
-import org.milyn.edisax.unedifact.handlers.r41.UNEdifact41ControlBlockHandlerFactory;
 import org.milyn.io.StreamUtils;
 import org.milyn.util.ClassUtil;
 import org.xml.sax.Attributes;
@@ -176,7 +175,6 @@ public class UnEdifactSpecificationReaderTest {
         MockContentHandler contentHandler = new MockContentHandler();
         EDIParser parser = new EDIParser();
         parser.setContentHandler(contentHandler);
-        parser.setNamespaceResolver(UNEdifact41ControlBlockHandlerFactory.new41NamespaceResolver());
         parser.setMappingModel(EDIParser.parseMappingModel(new StringReader(mappingModel)));
         parser.parse(new InputSource(testFileInputStream));
 
@@ -207,6 +205,9 @@ public class UnEdifactSpecificationReaderTest {
         lookup.addNamespace("medi", "http://www.milyn.org/schema/edi-message-mapping-1.5.xsd");
         Element node = (Element) lookup.selectSingleNode(doc);
         assertNotNull("Node with segment code " + segmentCode + " wasn't found", node);
+
+//        System.out.println(out.outputString(node));
+
         XMLUnit.setIgnoreWhitespace( true );
         XMLUnit.setIgnoreAttributeOrder(true);
     	XMLAssert.assertXMLEqual("Failed to compare XMLs for " + segmentCode, new StringReader(expected), new StringReader(out.outputString(node)));

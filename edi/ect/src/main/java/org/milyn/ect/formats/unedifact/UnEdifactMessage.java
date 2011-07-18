@@ -17,13 +17,13 @@ package org.milyn.ect.formats.unedifact;
 
 import org.milyn.ect.EdiParseException;
 import org.milyn.ect.common.XmlTagEncoder;
+import org.milyn.edisax.interchange.ControlBlockHandlerFactory;
 import org.milyn.edisax.model.internal.Delimiters;
 import org.milyn.edisax.model.internal.Description;
 import org.milyn.edisax.model.internal.Edimap;
 import org.milyn.edisax.model.internal.Import;
 import org.milyn.edisax.model.internal.Segment;
 import org.milyn.edisax.model.internal.SegmentGroup;
-import org.milyn.edisax.unedifact.UNEdifactNamespaceResolver;
 
 import java.io.*;
 import java.util.*;
@@ -177,7 +177,7 @@ public class UnEdifactMessage {
             edimap.setDescription(new Description());
             edimap.getDescription().setName(type);
             edimap.getDescription().setVersion(version + ":" + release + ":" + agency);
-            edimap.getDescription().setNamespace(UNEdifactNamespaceResolver.NAMESPACE_ROOT + ":" + agency.toLowerCase() + ":" + version.toLowerCase() + release.toLowerCase() + ":" + type.toLowerCase());
+            edimap.getDescription().setNamespace(ControlBlockHandlerFactory.NAMESPACE_ROOT + ":" + agency.toLowerCase() + ":" + version.toLowerCase() + release.toLowerCase() + ":" + type.toLowerCase());
 
             Map<String, Segment> segmentDefinitions = null;
             if (isSplitIntoImport) {
@@ -378,9 +378,12 @@ public class UnEdifactMessage {
         return group;
     }
 
-    private Segment createSegment(String id, String segcode, String description, String mandatory, String maxOccurance, Map<String, String> definitions, boolean isSplitIntoImport, boolean useShortName, Map<String, Segment> segmentDefinitions) {
+    private Segment createSegment(String id, String segcode, String name, String mandatory, String maxOccurance, Map<String, String> definitions, boolean isSplitIntoImport, boolean useShortName, Map<String, Segment> segmentDefinitions) {
         Segment segment = new Segment();
 
+        name = name.trim();
+
+        segment.setName(name);
         segment.setSegcode(segcode);
         segment.setNodeTypeRef(agency + ":" + segcode);
 
@@ -401,13 +404,14 @@ public class UnEdifactMessage {
         if (useShortName) {
             segment.setXmltag(segcode);
         } else {
-            segment.setXmltag(XmlTagEncoder.encode(description.trim()));
+            segment.setXmltag(XmlTagEncoder.encode(name.trim()));
         }
 
         segment.setDocumentation(definitions.get(id).trim());
         segment.setMinOccurs(mandatory.equals("M") ? 1 : 0);
         segment.setMaxOccurs(Integer.valueOf(maxOccurance));
         segment.setTruncatable(true);
+
         return segment;
     }
 

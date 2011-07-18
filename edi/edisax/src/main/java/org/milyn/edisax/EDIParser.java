@@ -16,8 +16,6 @@
 
 package org.milyn.edisax;
 
-import static javax.xml.XMLConstants.NULL_NS_URI;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,9 +29,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.XMLConstants;
-
-import org.apache.commons.lang.StringUtils;
 import org.milyn.assertion.AssertArgument;
 import org.milyn.edisax.model.EdifactModel;
 import org.milyn.edisax.model.internal.Component;
@@ -46,10 +41,9 @@ import org.milyn.edisax.model.internal.SegmentGroup;
 import org.milyn.edisax.model.internal.SubComponent;
 import org.milyn.edisax.model.internal.ValueNode;
 import org.milyn.edisax.util.EDIUtils;
-import org.milyn.edisax.util.NamespaceDeclarationStack;
 import org.milyn.javabean.DataDecodeException;
 import org.milyn.lang.MutableInt;
-import org.milyn.namespace.NamespaceResolver;
+import org.milyn.namespace.NamespaceDeclarationStack;
 import org.milyn.resource.URIResourceLocator;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -62,6 +56,8 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
+
+import javax.xml.XMLConstants;
 
 /**
  * EDI Parser.
@@ -149,23 +145,28 @@ public class EDIParser implements XMLReader {
 
     public static final String FEATURE_VALIDATE = "http://xml.org/sax/features/validation";
     public static final String FEATURE_IGNORE_NEWLINES = "http://xml.org/sax/features/ignore-newlines";
+    public static final String FEATURE_IGNORE_EMPTY_NODES = "http://smooks.org/edi/sax/features/ignore-empty-nodes";
 	private static final Attributes EMPTY_ATTRIBS = new AttributesImpl();
     
     private Map<String, Boolean> features;
 
-    /**
-     * Fields required for namespace support
-     */
-    private NamespaceResolver namespaceResolver;
-    private NamespaceDeclarationStack nsStack = new NamespaceDeclarationStack(this);
+    private NamespaceDeclarationStack nsStack;
 
-    
     private ContentHandler contentHandler;
     private MutableInt indentDepth;
     private static Pattern EMPTY_LINE = Pattern.compile("[\n\r ]*");
 
     private EdifactModel edifactModel;
     private BufferedSegmentReader segmentReader;
+    private Boolean ignoreEmptyNodes;
+
+    /**
+     * Set the {@link NamespaceDeclarationStack} to be used by the reader instance.
+     * @param nsStack The {@link NamespaceDeclarationStack} to be used by the reader instance.
+     */
+    public void setNamespaceDeclarationStack(NamespaceDeclarationStack nsStack) {
+        this.nsStack = nsStack;
+    }
 
     /**
      * Parse the supplied mapping model config path and return the generated EdiMap.
@@ -299,22 +300,6 @@ public class EDIParser implements XMLReader {
         edifactModel.setDescription(mappingDescription);
 
 		return edifactModel;
-    }
-
-    /**
-     * Set the namespace resolver for this reader instance.
-     * @param namespaceResolver The namespace resolver.
-     */
-    public void setNamespaceResolver(NamespaceResolver namespaceResolver) {
-        this.namespaceResolver = namespaceResolver;
-    }
-
-    /**
-     * Get the namespace resolver for this reader instance.
-     * @return The namespace resolver.
-     */
-    public NamespaceResolver getNamespaceResolver() {
-        return namespaceResolver;
     }
 
     /**
@@ -619,14 +604,14 @@ public class EDIParser implements XMLReader {
 	private void mapField(String fieldMessageVal, Field expectedField, int fieldIndex, String segmentCode) throws SAXException {
 		List<Component> expectedComponents = expectedField.getComponents();
 
-
 		// If there are components defined on this field...
 		if(expectedComponents.size() != 0) {
             Delimiters delimiters = segmentReader.getDelimiters();
 			String[] currentFieldComponents = EDIUtils.split(fieldMessageVal, delimiters.getComponent(), delimiters.getEscape());
 
             assertComponentsOK(expectedField, fieldIndex, segmentCode, expectedComponents, currentFieldComponents);
-            if (currentFieldComponents.length > 0) {
+
+            if (currentFieldComponents.length > 0 || !ignoreEmptyNodes()) {
             	startElement(expectedField, true);
 	            // Iterate over the field components and map them...
 				for(int i = 0; i < currentFieldComponents.length; i++) {
@@ -641,7 +626,8 @@ public class EDIParser implements XMLReader {
             if(expectedField.isRequired() && fieldMessageVal.length() == 0) {
                 throw new EDIParseException(edifactModel.getEdimap(), "Segment [" + segmentCode + "], field " + (fieldIndex + 1) + " (" + expectedField.getXmltag() + ") expected to contain a value.  Currently at segment number " + segmentReader.getCurrentSegmentNumber() + ".", expectedField, segmentReader.getCurrentSegmentNumber(), segmentReader.getCurrentSegmentFields());
             }
-            if (fieldMessageVal.length() > 0) {
+
+            if (fieldMessageVal.length() > 0 || !ignoreEmptyNodes()) {
                 startElement(expectedField, true);
                 writeToContentHandler(fieldMessageVal);
                 endElement(expectedField, false);
@@ -662,42 +648,46 @@ public class EDIParser implements XMLReader {
 	private void mapComponent(String componentMessageVal, Component expectedComponent, int fieldIndex, int componentIndex, String segmentCode, String field) throws SAXException {
 		List<SubComponent> expectedSubComponents = expectedComponent.getSubComponents();
 
-		startElement(expectedComponent, true);
-
 		if(expectedSubComponents.size() != 0) {
             Delimiters delimiters = segmentReader.getDelimiters();
 			String[] currentComponentSubComponents = EDIUtils.split(componentMessageVal, delimiters.getSubComponent(), delimiters.getEscape());
 
             assertSubComponentsOK(expectedComponent, fieldIndex, componentIndex, segmentCode, field, expectedSubComponents, currentComponentSubComponents);
 
-            for(int i = 0; i < currentComponentSubComponents.length; i++) {
-                if(expectedSubComponents.get(i).isRequired() && currentComponentSubComponents[i].length() == 0) {
-                    throw new EDIParseException(edifactModel.getEdimap(), "Segment [" + segmentCode + "], field " + (fieldIndex + 1) + " (" + field + "), component " + (componentIndex + 1) + " (" + expectedComponent.getXmltag() + "), sub-component " + (i + 1) + " (" + expectedSubComponents.get(i).getXmltag() + ") expected to contain a value.  Currently at segment number " + segmentReader.getCurrentSegmentNumber() + ".", expectedSubComponents.get(i), segmentReader.getCurrentSegmentNumber(), segmentReader.getCurrentSegmentFields());
-                }
+            if (currentComponentSubComponents.length > 0 || !ignoreEmptyNodes()) {
+                startElement(expectedComponent, true);
+                for(int i = 0; i < currentComponentSubComponents.length; i++) {
+                    if(expectedSubComponents.get(i).isRequired() && currentComponentSubComponents[i].length() == 0) {
+                        throw new EDIParseException(edifactModel.getEdimap(), "Segment [" + segmentCode + "], field " + (fieldIndex + 1) + " (" + field + "), component " + (componentIndex + 1) + " (" + expectedComponent.getXmltag() + "), sub-component " + (i + 1) + " (" + expectedSubComponents.get(i).getXmltag() + ") expected to contain a value.  Currently at segment number " + segmentReader.getCurrentSegmentNumber() + ".", expectedSubComponents.get(i), segmentReader.getCurrentSegmentNumber(), segmentReader.getCurrentSegmentFields());
+                    }
 
-				startElement(expectedSubComponents.get(i), true);
-                writeToContentHandler(currentComponentSubComponents[i]);
-				endElement(expectedSubComponents.get(i), false);
-			}
-			endElement(expectedComponent, true);
+                    startElement(expectedSubComponents.get(i), true);
+                    writeToContentHandler(currentComponentSubComponents[i]);
+                    endElement(expectedSubComponents.get(i), false);
+                }
+                endElement(expectedComponent, true);
+            }
 		} else {
             if(expectedComponent.isRequired() && componentMessageVal.length() == 0) {
                 throw new EDIParseException(edifactModel.getEdimap(), "Segment [" + segmentCode + "], field " + (fieldIndex + 1) + " (" + field + "), component " + (componentIndex + 1) + " (" + expectedComponent.getXmltag() + ") expected to contain a value.  Currently at segment number " + segmentReader.getCurrentSegmentNumber() + ".", expectedComponent, segmentReader.getCurrentSegmentNumber(), segmentReader.getCurrentSegmentFields());
             }
-			
-            writeToContentHandler(componentMessageVal);
-			endElement(expectedComponent, false);
+
+            if (componentMessageVal.length() > 0 || !ignoreEmptyNodes()) {
+                startElement(expectedComponent, true);
+                writeToContentHandler(componentMessageVal);
+                endElement(expectedComponent, false);
+            }
 		}
 	}
 
     private void assertFieldsOK(String[] currentSegmentFields, Segment segment) throws EDIParseException {
-        
+
         List<Field> expectedFields = segment.getFields();
 
         int numFieldsExpected = expectedFields.size() + 1; // It's "expectedFields.length + 1" because the segment code is included.
         int numberOfFieldsToValidate = 0;
-        
-        if(currentSegmentFields.length < numFieldsExpected) { 
+
+        if(currentSegmentFields.length < numFieldsExpected) {
             boolean throwException = false;
 
             // If we don't have all the fields we're expecting, check is the Segment truncatable
@@ -717,9 +707,9 @@ public class EDIParser implements XMLReader {
             if(throwException) {
                 throw new EDIParseException(edifactModel.getEdimap(), "Segment [" + segment.getSegcode() + "] expected to contain " + (numFieldsExpected - 1) + " fields.  Actually contains " + (currentSegmentFields.length - 1) + " fields (not including segment code).  Currently at segment number " + segmentReader.getCurrentSegmentNumber() + ".", segment, segmentReader.getCurrentSegmentNumber(), segmentReader.getCurrentSegmentFields());
             }
-            
+
             numberOfFieldsToValidate = currentSegmentFields.length;
-            
+
         } else if (currentSegmentFields.length > numFieldsExpected) {
         	// we have more fields than we are expecting.
         	if(segment.isIgnoreUnmappedFields()) {
@@ -740,9 +730,9 @@ public class EDIParser implements XMLReader {
         }
     }
 
-    private void assertComponentsOK(Field expectedField, int fieldIndex, String segmentCode, List<Component> expectedComponents, String[] currentFieldComponents) throws EDIParseException {        
+    private void assertComponentsOK(Field expectedField, int fieldIndex, String segmentCode, List<Component> expectedComponents, String[] currentFieldComponents) throws EDIParseException {
         if (currentFieldComponents.length != expectedComponents.size()) {
-            boolean throwException = false;            
+            boolean throwException = false;
 
             if (expectedField.isTruncatable()){
 
@@ -819,14 +809,8 @@ public class EDIParser implements XMLReader {
     private void validateValueNode(ValueNode valueNode, String value) throws EDIParseException {
 
         // Return when validation is turned off.
-        try {
-            if (!getFeature(FEATURE_VALIDATE)) {
-                return;
-            }
-        } catch (SAXNotRecognizedException e) {
-            throw new EDIParseException("Unable to decide whether to validate value-node or not.", e, valueNode, segmentReader.getCurrentSegmentNumber(), segmentReader.getCurrentSegmentFields());
-        } catch (SAXNotSupportedException e) {
-            throw new EDIParseException("Unable to decide whether to validate value-node or not.", e, valueNode, segmentReader.getCurrentSegmentNumber(), segmentReader.getCurrentSegmentFields());
+        if (!getFeature(FEATURE_VALIDATE)) {
+            return;
         }
 
         // Validate type.
@@ -868,15 +852,14 @@ public class EDIParser implements XMLReader {
             indent();
         }
         AssertArgument.isNotNull(namespace, "Empty namespace detected for elemnet " + elementName);
-        if (NULL_NS_URI.equals(namespace)) {
-        	// No namespace support
-        	contentHandler.startElement(NULL_NS_URI, elementName, elementName, attributes);
+
+        String nsPrefix = getNamespacePrefix(namespace);
+        if(nsPrefix != null) {
+            contentHandler.startElement(namespace, elementName, nsPrefix + ":" + elementName, attributes);
         } else {
-        	// With namespace support
-            String alias = getNamespaceAlias(namespace);
-            Attributes modifiedAttributes = nsStack.push(alias, namespace, attributes);
-			contentHandler.startElement(namespace, elementName, alias + ":" + elementName, modifiedAttributes);
+            contentHandler.startElement(namespace, elementName, elementName, attributes);
         }
+
         indentDepth.value++;
     }
 
@@ -886,56 +869,48 @@ public class EDIParser implements XMLReader {
     	}
     }
 
-    
     public void endElement(String elementName, String namespace, boolean indent) throws SAXException {
     	indentDepth.value--;
         if(indent) {
             indent();
         }
-        if (XMLConstants.NULL_NS_URI.equals(namespace)) {
-        	// No namespace support
-        	contentHandler.endElement(NULL_NS_URI, elementName, elementName);
+
+        String nsPrefix = getNamespacePrefix(namespace);
+        if(nsPrefix != null) {
+            contentHandler.endElement(namespace, elementName, nsPrefix + ":" + elementName);
         } else {
-        	// With namespace support
-	        String alias = getNamespaceAlias(namespace);
-	        nsStack.pop();
-	        contentHandler.endElement(namespace, elementName, alias + ":" + elementName);
+            contentHandler.endElement(namespace, elementName, elementName);
         }
     }
 
     /**
      * This method returns a namespace prefix associated with
-     * given namespace. If no association was found it will
-     * create an prefix "an[0-9]+"
-     * 
-     * Important is that for equal namespaces we have equal aliases
-     * 
-     * @param namespace
-     * @return
-     * @throws SAXException 
+     * given namespace.
+     *
+     * @param namespace The namespace.
+     * @return The namespace prefix.
      */
-    private String getNamespaceAlias(String namespace) throws SAXException {
-    	if (StringUtils.isEmpty(namespace) || StringUtils.isBlank(namespace)) {
-    		return "";
+    private String getNamespacePrefix(String namespace) {
+        if(nsStack == null) {
+            return null;
+        }
+    	if (namespace == null || XMLConstants.NULL_NS_URI.equals(namespace)) {
+    		return null;
     	}
 
-        if(namespaceResolver == null) {
-            throw new SAXException("Unable to resolve namespace prefix for namespace '" + namespace + "' because the EDIParser instance does not have a NamespaceResolver.");
-        }
-
-        return namespaceResolver.getPrefix(namespace);
+        return nsStack.getPrefix(namespace);
 	}
 
-    
     // HACK :-) it's hardly going to be deeper than this!!
     private static final char[] indentChars = (new String("\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t").toCharArray());
+
+
     private void indent() throws SAXException {
     	if(indentDepth == null) {
     		throw new IllegalStateException("'indentDepth' property not set on parser instance.  Cannot indent.");
     	}
         contentHandler.characters(indentChars, 0, indentDepth.value + 1);
     }
-
     public void setContentHandler(ContentHandler contentHandler) {
         this.contentHandler = contentHandler;
     }
@@ -952,18 +927,27 @@ public class EDIParser implements XMLReader {
         contentHandler.characters(messageVal.toCharArray(), 0, messageVal.length());
     }
 
-    private Map<String, Boolean> getFeatures() {
+    public Map<String, Boolean> getFeatures() {
         if (features == null) {
             initializeFeatures();
         }
         return features;
     }
+
     private void initializeFeatures() {
         features = new HashMap<String,Boolean>();
         features.put(FEATURE_VALIDATE, false);
         features.put(FEATURE_IGNORE_NEWLINES, false);
+        features.put(FEATURE_IGNORE_EMPTY_NODES, true);
     }
-    
+    private boolean ignoreEmptyNodes() {
+        if (ignoreEmptyNodes == null) {
+            ignoreEmptyNodes = getFeature(FEATURE_IGNORE_EMPTY_NODES);
+        }
+
+        return ignoreEmptyNodes;
+    }
+
     /****************************************************************************
      *
      * The following methods are currently unimplemnted...
@@ -974,39 +958,39 @@ public class EDIParser implements XMLReader {
     	throw new UnsupportedOperationException("Operation not supports by this reader.");
     }
     
-    public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public boolean getFeature(String name) {
     	return getFeatures().get(name);
     }
-    
+
     public void setFeature(String name, boolean value) {
     	getFeatures().put(name, value);
     }
-    
+
     public DTDHandler getDTDHandler() {
     	return null;
     }
-    
+
     public void setDTDHandler(DTDHandler arg0) {
     }
-    
+
     public EntityResolver getEntityResolver() {
     	return null;
     }
-    
+
     public void setEntityResolver(EntityResolver arg0) {
     }
-    
+
     public ErrorHandler getErrorHandler() {
     	return null;
     }
-    
+
     public void setErrorHandler(ErrorHandler arg0) {
     }
-    
+
     public Object getProperty(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
     	return null;
     }
-    
+
     public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
     }
 }

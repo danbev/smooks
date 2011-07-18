@@ -23,12 +23,13 @@ import org.milyn.edisax.model.internal.Delimiters;
 import org.milyn.edisax.model.internal.Description;
 import org.milyn.edisax.model.internal.Edimap;
 import org.milyn.edisax.model.internal.Segment;
-import org.milyn.edisax.unedifact.registry.MappingsRegistry;
+import org.milyn.edisax.registry.MappingsRegistry;
 import org.milyn.lang.MutableInt;
-import org.milyn.namespace.NamespaceResolver;
-import org.milyn.namespace.SimpleNamespaceResolver;
+import org.milyn.namespace.NamespaceDeclarationStack;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+
+import java.util.Map;
 
 /**
  * EDI message interchange context object.
@@ -41,24 +42,26 @@ public class InterchangeContext {
 
 	private BufferedSegmentReader segmentReader;
 	private ContentHandler contentHandler;
-	private EDIParser controlSegmentParser;
+    private Map<String,Boolean> features;
+    private EDIParser controlSegmentParser;
     public MutableInt indentDepth = new MutableInt(0);
     private ControlBlockHandlerFactory controlBlockHandlerFactory;
     private boolean validate;
-	private MappingsRegistry registry;
-    private NamespaceResolver namespaceResolver;
+    private MappingsRegistry registry;
+    private NamespaceDeclarationStack namespaceDeclarationStack;
+    private boolean containerManagedNamespaceStack = false;
 
     /**
 	 * Public constructor.
-	 * 
-	 * @param segmentReader The interchange {@link org.milyn.edisax.BufferedSegmentReader} instance.
+	 *
+     * @param segmentReader The interchange {@link org.milyn.edisax.BufferedSegmentReader} instance.
      * @param registry The {@link org.milyn.edisax.model.EdifactModel Mapping Models} registry.
      * @param contentHandler The {@link org.xml.sax.ContentHandler content handler} instance to receive the interchange events.
+     * @param parserFeatures Parser features.
      * @param controlBlockHandlerFactory Control Block Handler Factory.
-     * @param namespaceResolver Namespace resolver.
      * @param validate Validate the data types of the EDI message data as defined in the mapping model.
-	 */
-	public InterchangeContext(BufferedSegmentReader segmentReader, MappingsRegistry registry, ContentHandler contentHandler, ControlBlockHandlerFactory controlBlockHandlerFactory, NamespaceResolver namespaceResolver, boolean validate) {
+     */
+	public InterchangeContext(BufferedSegmentReader segmentReader, MappingsRegistry registry, ContentHandler contentHandler, Map<String, Boolean> parserFeatures, ControlBlockHandlerFactory controlBlockHandlerFactory, NamespaceDeclarationStack namespaceDeclarationStack, boolean validate) {
 		AssertArgument.isNotNull(segmentReader, "segmentReader");
 		AssertArgument.isNotNull(registry, "registry");
 		AssertArgument.isNotNull(contentHandler, "contentHandler");
@@ -66,15 +69,22 @@ public class InterchangeContext {
 		this.segmentReader = segmentReader;
 		this.registry = registry;
 		this.contentHandler = contentHandler;
+        this.features = parserFeatures;
         this.controlBlockHandlerFactory = controlBlockHandlerFactory;
 		this.validate = validate;
-        this.namespaceResolver = namespaceResolver;
+        this.namespaceDeclarationStack = namespaceDeclarationStack;
 
 		controlSegmentParser = new EDIParser();
 		controlSegmentParser.setBufferedSegmentReader(segmentReader);
-        controlSegmentParser.setNamespaceResolver(namespaceResolver);
 		controlSegmentParser.setContentHandler(contentHandler);
 		controlSegmentParser.setIndentDepth(indentDepth);
+
+        if (this.namespaceDeclarationStack == null) {
+            this.namespaceDeclarationStack= new NamespaceDeclarationStack();
+        } else {
+            this.containerManagedNamespaceStack = true;
+        }
+        controlSegmentParser.setNamespaceDeclarationStack(this.namespaceDeclarationStack);
 
         Edimap controlMap = new Edimap();
         EdifactModel controlModel = new EdifactModel(controlMap);
@@ -103,15 +113,20 @@ public class InterchangeContext {
         return controlBlockHandlerFactory.getNamespace();
     }
 
+    public NamespaceDeclarationStack getNamespaceDeclarationStack() {
+        return namespaceDeclarationStack;
+    }
+
     public EDIParser newParser(EdifactModel mappingModel) {
 		EDIParser parser = new EDIParser();
 
-        parser.setNamespaceResolver(namespaceResolver.clone());
 		parser.setContentHandler(contentHandler);
 		parser.setMappingModel(mappingModel);
 		parser.setBufferedSegmentReader(segmentReader);
 		parser.setIndentDepth(indentDepth);
+        parser.getFeatures().putAll(features);
 		parser.setFeature(EDIParser.FEATURE_VALIDATE, validate);
+        parser.setNamespaceDeclarationStack(namespaceDeclarationStack);
 
 		return parser;
 	}
@@ -138,13 +153,17 @@ public class InterchangeContext {
     public void popDelimiters() {
         segmentReader.popDelimiters();
     }
-    
+
     /**
      * Returns an instance of {@link MappingsRegistry}
-     * 
+     *
      * @return
      */
     public MappingsRegistry getRegistry() {
 		return registry;
 	}
+
+    public boolean isContainerManagedNamespaceStack() {
+        return containerManagedNamespaceStack;
+    }
 }
