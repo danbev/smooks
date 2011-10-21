@@ -12,8 +12,7 @@
     <groupId>org.milyn</groupId>
     <artifactId>milyn</artifactId>
     <packaging>pom</packaging>
-    <version>1.5-SNAPSHOT</version>
-    <!-- base pom version - do not remove this comment -->
+    <version>1.5</version> <!-- base pom version - do not remove this comment -->
     <name>Milyn (Base POM)</name>
     <url>http://milyn.codehaus.org</url>
 
@@ -23,7 +22,7 @@
         <xerces.version>2.9.1</xerces.version>
         <xalan.version>2.7.1</xalan.version>
         <xml_apis.version>1.3.02</xml_apis.version>
-        <xstream.version>1.2.2</xstream.version>
+        <xstream.version>1.4.1</xstream.version>
         <commons_lang.version>2.4</commons_lang.version>
         <nekohtml.version>0.9.5</nekohtml.version>
         <dtdparser.version>1.21</dtdparser.version>
@@ -226,7 +225,6 @@
                         <link>http://www.milyn.org/javadoc/v${project.version}/commons</link>
                         <link>http://www.milyn.org/javadoc/v${project.version}/tinak</link>
                         <link>http://www.milyn.org/javadoc/v${project.version}/smooks</link>
-                        <link>http://www.milyn.org/javadoc/v${project.version}/magger</link>
                         <link>http://www.milyn.org/javadoc/v${project.version}/edisax</link>
                         <link>http://www.w3.org/Style/CSS/SAC/doc/</link>
                     </links>
